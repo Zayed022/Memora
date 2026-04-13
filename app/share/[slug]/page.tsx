@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic"
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { formatDate, getItemTypeIcon, getItemTypeLabel } from '@/lib/utils'
