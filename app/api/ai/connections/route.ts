@@ -21,7 +21,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ connections: [], message: 'Need at least 2 items' })
   }
 
-  const aiConnections = await findConnections(items)
+  const safeItems = items.map(item => ({
+    ...item,
+    summary: item.summary ?? ""
+  }))
+  
+  const aiConnections = await findConnections(safeItems)
 
   // Delete old connections and save new ones
   await prisma.connection.deleteMany({ where: { userId: user.id } })
