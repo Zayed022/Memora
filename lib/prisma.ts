@@ -1,9 +1,18 @@
-import { PrismaClient } from '@prisma/client'
+export const runtime = "nodejs"
+export const dynamic = "force-dynamic"
 
-const globalForPrisma = globalThis as unknown as { prisma: PrismaClient }
+import { auth } from '@clerk/nextjs/server'
+import { NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
 
-export const prisma =
-  globalForPrisma.prisma ||
-  new PrismaClient({ log: process.env.NODE_ENV === 'development' ? ['error'] : [] })
+export async function GET() {
+  return NextResponse.json({ status: "ok" })
+}
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+export async function DELETE() {
+  const { userId } = auth()
+  if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  await prisma.user.deleteMany({ where: { clerkId: userId } })
+  return NextResponse.json({ success: true })
+}
