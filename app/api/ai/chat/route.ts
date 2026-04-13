@@ -39,7 +39,12 @@ export async function POST(req: NextRequest) {
     })
   }
 
-  const answer = await answerFromKnowledge(question, items)
+  const safeItems = items.map(item => ({
+    ...item,
+    summary: item.summary ?? ""
+  }))
+  
+  const answer = await answerFromKnowledge(question, safeItems)
 
   return NextResponse.json({ answer, remaining: rl.remaining })
 }
