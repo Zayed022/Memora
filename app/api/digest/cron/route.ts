@@ -4,7 +4,6 @@ import { generateWeeklyDigest } from '@/lib/ai'
 
 // Vercel cron: every Monday at 8am UTC
 export async function GET(req: NextRequest) {
-  // Verify cron secret
   const authHeader = req.headers.get('authorization')
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -22,13 +21,19 @@ export async function GET(req: NextRequest) {
 
   for (const user of proUsers) {
     try {
-      const items = await prisma.item.findMany({
+      const rawItems = await prisma.item.findMany({
         where: { userId: user.id, status: 'READY', createdAt: { gte: weekStart } },
         select: { title: true, summary: true, tags: true, createdAt: true },
         orderBy: { createdAt: 'desc' },
       })
 
-      if (items.length === 0) continue
+      if (rawItems.length === 0) continue
+
+      // Normalise: replace null summary with empty string so types match
+      const items = rawItems.map(item => ({
+        ...item,
+        summary: item.summary ?? '',
+      }))
 
       const content = await generateWeeklyDigest(items, user.name ?? 'there')
 
@@ -38,7 +43,6 @@ export async function GET(req: NextRequest) {
 
       processed++
 
-      // Rate limit: small delay between users to avoid API overload
       await new Promise(r => setTimeout(r, 500))
     } catch (err) {
       console.error(`Digest failed for user ${user.id}:`, err)
