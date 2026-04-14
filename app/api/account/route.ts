@@ -3,16 +3,16 @@ export const dynamic = 'force-dynamic'
 
 import { auth } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
 
 export async function DELETE() {
   try {
     const { userId } = auth()
-
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Lazy import — prevents Prisma from running at build time
+    const { prisma } = await import('@/lib/prisma')
     await prisma.user.deleteMany({ where: { clerkId: userId } })
 
     return NextResponse.json({ success: true })

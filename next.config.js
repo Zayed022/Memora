@@ -6,6 +6,8 @@ const nextConfig = {
   experimental: {
     serverActions: { bodySizeLimit: '10mb' },
   },
+  // Prevent Next.js from trying to statically analyse API routes at build time
+  output: 'standalone',
 }
 
 module.exports = nextConfig
