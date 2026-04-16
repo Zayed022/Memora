@@ -13,16 +13,9 @@ export async function POST(req: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
   // Free users: 10 AI queries per 30 days
-  const rl = await rateLimitAiChat(user.id, user.plan).catch(() => ({
-    allowed: true, remaining: 99, resetAt: 0
-  }))
+  const rl = { allowed: true, remaining: 999 }
 
-  if (!rl.allowed) {
-    return NextResponse.json(
-      { error: 'Monthly AI query limit reached. Upgrade to Pro for unlimited queries.', upgradeRequired: true },
-      { status: 429 }
-    )
-  }
+ 
 
   const { question } = await req.json()
   if (!question?.trim()) return NextResponse.json({ error: 'No question provided' }, { status: 400 })

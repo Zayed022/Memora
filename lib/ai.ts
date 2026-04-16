@@ -14,17 +14,18 @@ async function callAI(prompt: string, systemPrompt?: string, maxTokens = 1024): 
   // 1. Try Gemini Flash-Lite first (1000 req/day free)
   if (GEMINI_API_KEY) {
     const models = [
-      'gemini-2.5-flash-lite-preview-06-17',
-      'gemini-2.5-flash',
-      'gemini-2.0-flash',
+      'gemini-1.5-flash',
+      'gemini-1.5-pro'
     ]
+
+    console.log("GEMINI KEY:", !!GEMINI_API_KEY)
+console.log("GROQ KEY:", !!GROQ_API_KEY)
     for (const model of models) {
       try {
         return await callGemini(prompt, systemPrompt, maxTokens, model)
       } catch (err: any) {
-        const rateLimited = err?.status === 429 || String(err?.message).includes('429') || String(err?.message).toLowerCase().includes('quota')
-        if (!rateLimited) throw err
-        console.warn(`[ai] Gemini ${model} rate limited, trying next model…`)
+        console.warn(`[ai] Gemini ${model} failed:`, err?.message)
+        continue
       }
     }
   }
@@ -139,28 +140,54 @@ export async function answerFromKnowledge(
   question: string,
   items: Array<{ title: string; summary: string; keyInsights: string[]; tags: string[]; createdAt: Date }>
 ): Promise<string> {
+
   if (items.length === 0) {
-    return "You don't have any saved items yet. Save some articles or notes first!"
+    return "You don't have any saved items yet."
   }
 
-  const context = items.slice(0, 15).map((item, i) =>
-    `[${i + 1}] "${item.title}" (saved ${new Date(item.createdAt).toLocaleDateString()})\n` +
-    `Summary: ${item.summary ?? 'No summary'}\n` +
-    (item.keyInsights?.length ? `Key insights: ${item.keyInsights.join(' • ')}` : '')
-  ).join('\n\n')
+  const context = items.map((item, i) => `
+[${i + 1}] ${item.title}
+Summary: ${item.summary || "No summary"}
+Tags: ${(item.tags || []).join(", ")}
+Insights: ${(item.keyInsights || []).join(", ")}
+`).join("\n\n")
 
-  const system = `You are an AI assistant with access to the user's personal knowledge base.
-Answer their question using ONLY the context provided. Be specific, cite items by [number].
-Be concise — 2-4 sentences max unless more detail is clearly needed.
-If the knowledge base lacks sufficient info, say so and suggest what they might want to save.`
+  const system = `
+You are an AI assistant helping the user understand their saved knowledge.
+
+Rules:
+- Use the provided items to answer.
+- You CAN infer meaning (don't require exact keyword match).
+- Even if partial relevance exists → answer helpfully.
+- NEVER say "No answer found".
+- If weak match → still give best possible interpretation.
+
+Style:
+- Friendly, clear, insightful
+- 2–4 sentences max
+- Reference items when useful
+`
+
+  const prompt = `
+USER QUESTION:
+${question}
+
+USER KNOWLEDGE:
+${context}
+
+Now answer the question.
+`
 
   try {
-    return await callAI(`Knowledge base:\n${context}\n\nQuestion: ${question}`, system, 500)
-  } catch (err: any) {
-    if (err?.message === 'AI_UNAVAILABLE') {
-      return 'AI is temporarily unavailable. Please check your GEMINI_API_KEY in .env.local and restart the server.'
+    const res = await callAI(prompt, system, 600)
+
+    if (!res || res.trim().length < 20) {
+      return "I couldn't find a direct match, but based on your saved items, you’ve been exploring related ideas. Try asking in a slightly different way."
     }
-    throw err
+
+    return res
+  } catch {
+    return "AI is temporarily unavailable. Please try again."
   }
 }
 
