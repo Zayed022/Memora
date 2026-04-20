@@ -147,17 +147,15 @@ export async function GET(req: NextRequest) {
   const zipBuffer = buildZip(zipEntries)
 const body = new Uint8Array(zipBuffer)
 
-
-
-  return new NextResponse(zipBuffer, {
-    headers: {
-      'Content-Type':        'application/zip',
-      'Content-Disposition': `attachment; filename="memora-knowledge-${user.id.slice(-8)}-${new Date().toISOString().split('T')[0]}.zip"`,
-      'Content-Length':      zipBuffer.byteLength.toString(),
-      'X-Export-Items':      items.length.toString(),
-      'X-Export-Format':     'memora-v3',
-    },
-  })
+return new NextResponse(body, {
+  headers: {
+    'Content-Type': 'application/zip',
+    'Content-Disposition': `attachment; filename="memora-knowledge-${user.id.slice(-8)}-${new Date().toISOString().split('T')[0]}.zip"`,
+    'Content-Length': zipBuffer.byteLength.toString(),
+    'X-Export-Items': items.length.toString(),
+    'X-Export-Format': 'memora-v3',
+  },
+})
 }
 
 // ── Pure ZIP builder (no external library) ────────────────────────────────────
