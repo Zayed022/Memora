@@ -23,7 +23,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: 'No items this week' }, { status: 200 })
   }
 
-  const content = await generateWeeklyDigest(items, user.name ?? 'there')
+  const safeItems = items.map(item => ({
+    ...item,
+    summary: item.summary ?? ""
+  }))
+  
+  const content = await generateWeeklyDigest(safeItems, user.name ?? 'there')
 
   const digest = await prisma.weeklyDigest.create({
     data: {
