@@ -70,7 +70,7 @@ export default function AddItemPage() {
 
   return (
     <div className="max-w-2xl mx-auto p-6">
-      <div className="mb-8">
+      <div className="mb-8 mt-12">
         <h1 className="font-display text-3xl text-ink-900 mb-1">Add to your knowledge base</h1>
         <p className="text-ink-400 text-sm">AI summarises, tags, and connects everything automatically.</p>
       </div>

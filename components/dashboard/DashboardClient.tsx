@@ -214,10 +214,10 @@ export default function DashboardClient({ user, initialItems, initialConnections
     <div className="flex h-full">
       {/* ── Main panel ─────────────────────────────────────────── */}
       <div className="flex-1 overflow-y-auto min-w-0 bg-[#f4f3ef]">
-        <div className="p-5 space-y-4 max-w-5xl mt-12">
+        <div className="p-5 space-y-4 max-w-5xl ">
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-3 mt-12">
             {[
               { label: 'Items saved',    value: totalItems,         icon: '⊞' },
               { label: 'AI connections', value: connections.length, icon: '✦' },

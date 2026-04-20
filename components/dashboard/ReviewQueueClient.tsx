@@ -61,7 +61,7 @@ export default function ReviewQueueClient({
     return (
       <div className="p-6 max-w-2xl mx-auto">
         <div className="bg-white border border-ink-100 rounded-2xl p-12 text-center">
-          <div className="text-5xl mb-4">🎉</div>
+          <div className="text-5xl mb-4 mt-12">🎉</div>
           <h2 className="font-display text-3xl text-ink-900 mb-3">Session complete!</h2>
           <p className="text-ink-500 mb-6">You reviewed {items.length} item{items.length !== 1 ? 's' : ''}. Great work.</p>
           <div className="flex gap-3 justify-center">
