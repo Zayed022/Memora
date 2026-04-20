@@ -83,12 +83,12 @@ export default function VsPage() {
           {[
             {
               vs: 'Notion', color: '#928c82',
-              summary: 'Notion is a powerful workspace tool. But it's designed for teams to organise projects — not individuals to retain knowledge. Every item in Notion requires manual processing: title, tags, properties, links. Memora does all of that automatically.',
+              summary: 'Notion is a powerful workspace tool. But it is designed for teams to organise projects — not individuals to retain knowledge. Every item in Notion requires manual processing: title, tags, properties, links. Memora does all of that automatically.',
               winText: 'Memora wins because it works without effort. Notion is a blank canvas you have to build yourself.',
             },
             {
               vs: 'Readwise', color: '#f59e0b',
-              summary: 'Readwise is excellent for resurface highlights from books. But it only works with content you've already highlighted — it can't read and summarise new articles. It doesn't answer questions from your knowledge base or discover connections.',
+              summary: 'Readwise is excellent for resurface highlights from books. But it only works with content you have already highlighted — it cant read and summarise new articles. It just not only answer questions from your knowledge base or discover connections.',
               winText: 'Memora wins on capture. Readwise requires highlights already exist. Memora works from any URL, note, or video.',
             },
             {
