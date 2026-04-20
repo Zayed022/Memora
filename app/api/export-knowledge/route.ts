@@ -145,6 +145,9 @@ export async function GET(req: NextRequest) {
   }
 
   const zipBuffer = buildZip(zipEntries)
+const body = new Uint8Array(zipBuffer)
+
+
 
   return new NextResponse(zipBuffer, {
     headers: {
